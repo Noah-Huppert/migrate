@@ -1,0 +1,9 @@
+[package]
+name = "migrate"
+version = "0.1.0"
+authors = ["Noah Huppert <noahuppert@gmail.com>"]
+
+[dependencies]
+clap  = "2"
+rust-ini = "*"
+postgres = "*"
