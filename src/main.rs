@@ -1,26 +1,11 @@
 extern crate clap;
 extern crate ini;
+extern crate postgres;
 
-use std::env;
+pub mod cmd_run;
+
+use std::io::{self, Write};
 use clap::{Arg, App, SubCommand};
-use ini::Ini;
-
-#[derive(Debug)]
-struct DatabaseConf {
-    host: String,
-    user: String,
-    password: String
-}
-
-impl DatabaseConf {
-    fn new(host: String, user: String, password: String) -> DatabaseConf {
-        DatabaseConf {
-            host: host,
-            user: user,
-            password: password
-         }
-    }
-}
 
 /*
 fn get_db_conf(opts: &clap::ArgMatches) -> DatabaseConf {
@@ -99,24 +84,11 @@ fn get_db_conf(opts: &clap::ArgMatches) -> DatabaseConf {
     db_conf
 }
 */
+
 fn main() {
     let prgm_ver = env!("CARGO_PKG_VERSION");
 
     // Define command line options
-    /*
-    let matches = App::new("Migrate")
-                        .version(prgm_ver)
-                        .about("A lightweight tool for running database migration written in rust")
-                        .subcommand(SubCommand::with_name("create")
-                            .about("Create scaffold for a migration")
-                        )
-                        .subcommand(SubCommand::with_name("run")
-                            .about("Run migrations")
-                            .arg(Arg::with_name("config").help("Path to database access configuration file")
-                                .
-                            )
-                        )
-                        */
     let app_matches = App::new("Migrate")
                             .version(prgm_ver)
                             .about("Lightweight database migration runner")
@@ -170,33 +142,16 @@ fn main() {
 
     match app_matches.subcommand() {
         ("create", Some(sub_matches)) => {
-            println!("TODO: create command");
+            println!("TODO: create command -> {:?}", sub_matches);
         }
         ("run", Some(sub_matches)) => {
-            cmd_run(&sub_matches);
+            match cmd_run::cmd_run(&sub_matches) {
+                Ok(_) => {}
+                Err(err) => {
+                    writeln!(&mut io::stderr(), "{}", err).expect("Failed to write to stderr");
+                }
+            }
         }
         _ => {}
     }
-
-    /*
-    let mut opts_conf = Options::new();
-
-    opts_conf.optopt("c", "config", "Config file for specifying host, user, and password of database. Values set in file will be overridden by their respective flags", "database_auth.ini");
-    opts_conf.optopt("h", "host", "Database host", "localhost:5432");
-    opts_conf.optopt("u", "user", "Database user", "migrator");
-    opts_conf.optopt("p", "password", "Database password", "password123");
-    opts_conf.optopt("e", "env", "Application environment", "dev");
-
-    // Parse command line options
-    let opts = match opts_conf.parse(&args) {
-        Ok(matches) => { matches }
-        Err(err) => {
-            panic!("Err parsing command line options: {}", err.to_string())
-        }
-    };
-
-    // Load Db configuration
-    let db_conf = get_db_conf(&opts);
-    println!("{:?}", db_conf);
-    */
 }
