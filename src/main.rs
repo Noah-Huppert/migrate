@@ -7,84 +7,6 @@ pub mod cmd_run;
 use std::io::{self, Write};
 use clap::{Arg, App, SubCommand};
 
-/*
-fn get_db_conf(opts: &clap::ArgMatches) -> DatabaseConf {
-    let mut db_conf = DatabaseConf::new("".to_string(), "".to_string(), "".to_string());
-    
-    // Load configuration from ini file
-    match opts.opt_str("c") {
-        Some(fconf_path) => {
-            let fconf = match Ini::load_from_file(&*fconf_path) {
-                Ok(fconf) => { fconf }
-                Err(err) => {
-                    panic!("Error opening config file: {}", err.to_string())
-                }
-            };
-
-            let e = opts.opt_str("e");
-            let section = match fconf.section(e.clone()) {
-                Some(s) => { s }
-                None => {
-                    panic!("\"{}\" environment section not found in config file provided", e.clone().unwrap_or("None".to_owned()))
-                }
-            };
-            // Check for host
-            if section.contains_key("host") {
-                db_conf.host = section.get("host").unwrap().to_string();
-            }
-
-            // Check for user
-            if section.contains_key("user") {
-                db_conf.user = section.get("user").unwrap().to_string();
-            }
-
-            // Check for password
-            if section.contains_key("password") {
-                db_conf.password = section.get("password").unwrap().to_string();
-            }
-        }
-        None => {}
-    };
-
-    // Load configuration from options
-    match opts.opt_str("h") {
-        Some(host) => {
-            db_conf.host = host;
-        }
-        None => {}
-    }
-
-    match opts.opt_str("u") {
-        Some(user) => {
-            db_conf.user = user;
-        }
-        None => {}
-    }
-
-    match opts.opt_str("p") {
-        Some(password) => {
-            db_conf.password = password;
-        }
-        None => {}
-    }
-
-    // Check that necessary configuration values are set
-    if db_conf.host.is_empty() {
-        panic!("Database host must be provided either with -h or in an .ini file specified with -c");
-    }
-
-    if db_conf.user.is_empty() {
-        panic!("Database user must be provided either with -u or in an .ini file specified with -c");
-    }
-
-    if db_conf.password.is_empty() {
-        panic!("Database password must be provided either with -p or in an .ini file specified with -c");
-    }
-
-    db_conf
-}
-*/
-
 fn main() {
     let prgm_ver = env!("CARGO_PKG_VERSION");
 
@@ -98,7 +20,13 @@ fn main() {
                                     .help("Name of database migration")
                                     .index(1)
                                     .required(true)
-                                 )
+                                )
+                                .arg(Arg::with_name("migrations-dir")
+                                    .help("The directory to put the new migration in.")
+                                    .short("d")
+                                    .takes_value(true)
+                                    .default_value("migrations")
+                                )
                             )
                             .subcommand(SubCommand::with_name("run")
                                 .about("Run migrations")
@@ -106,6 +34,13 @@ fn main() {
                                     .help("Database schema version that \"run\" command should attempt to reach")
                                     .short("t")
                                     .takes_value(true)
+                                    .required(true)
+                                )
+                                .arg(Arg::with_name("migrations-dir")
+                                    .help("The directory to look for migrations in.")
+                                    .short("d")
+                                    .takes_value(true)
+                                    .default_value("migrations")
                                 )
                                 .arg(Arg::with_name("environment")
                                     .help("Environment which application is running in")
