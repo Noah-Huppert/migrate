@@ -1,3 +1,5 @@
+# TODO: Figure out how to export a static `command: Command` object from this module.
+# TODO: Convert infro `Command`
 extern crate clap;
 extern crate ini;
 extern crate postgres;

@@ -41,6 +41,12 @@ This option specifies when in the migration process backups should take place.
 ## `create`
 The create command places boilerplate migration files into the specified directory
 
+### Usage
+```
+create <migration name>
+```
+Where `migration name` is a short descriptor of the migration. Think of it as a commit message in git.
+
 ### `--migrations-dir/-d` option
 The directory to put the new migration in. Defaults to `migrations`.
 
@@ -50,19 +56,33 @@ A typical migration would look as such
 ```
 |- migrations        <-- `--migrations-dir/-d`
 |--- add-posts-table <-- Short descriptive name of migration
-|----- conf.ini      <-- Migration configuration file
+|----- version      <-- Migration configuration file
 |----- up.rs         <-- Rust file to run when performing the migration
 |----- down.rs       <-- Rust file which reverses changes made in up.rs
 
 ---
 
 # migrations/add-posts-table/version
-2                    <-- Specifies which schema version the migraiton provides
+2                    <-- Specifies which schema version the migration provides
+
+< -- Run SQL queries and other complex logic in Rust -- >
 
 # migrations/add-posts-table/up.rs
 extern crate postgres;
 
-fn run(db: *postgres:Database) {
-	db.exec("CREATE TABLE posts;");
+use postgres::Connection;
+
+fn run(conn: *postgres::Connection) {
+	conn.execute("CREATE TABLE posts;");
+}
+
+# migrations/down.rs
+extern crate postgres;
+
+use postgres::Connection;
+
+fn run(conn: *postgres::Connection) {
+    conn.execute("DROP TABLE posts;");
 }
 ```
+
