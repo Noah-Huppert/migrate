@@ -2,7 +2,7 @@ extern crate clap;
 
 use clap::ArgMatches;
 
-trait Command {
-    fn from_matches(matches: &ArgMatched) -> Result<Command, String>;
+pub trait Command <CmdT> {
+    fn from_matches(matches: &ArgMatches) -> Result<CmdT, String>;
     fn run(&self) -> Result<(), String>;
 }

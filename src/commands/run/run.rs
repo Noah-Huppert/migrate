@@ -1,5 +1,3 @@
-# TODO: Figure out how to export a static `command: Command` object from this module.
-# TODO: Convert into `Command`
 extern crate clap;
 extern crate ini;
 extern crate postgres;
@@ -8,26 +6,30 @@ use clap::ArgMatches;
 use ini::Ini;
 use postgres::{Connection, SslMode};
 
+use models;
+
 #[derive(Debug)]
-struct RunCmd {
+pub struct RunCmd {
     host: String,
     user: String,
-    password: String
+    password: String,
+    database: String
 }
 
 impl RunCmd {
-    fn new(host: String, user: String, password: String) -> RunCmd {
+    pub fn new(host: String, user: String, password: String, database: String) -> RunCmd {
         RunCmd {
             host: host,
             user: user,
-            password: password
+            password: password,
+            database: database
          }
     }
 }
 
-impl Command for RunCmd {
+impl models::command::Command <RunCmd> for RunCmd {
     fn from_matches(matches: &ArgMatches) -> Result<RunCmd, String> {
-        let mut obj = RunCmd {};
+        let mut obj = RunCmd::new(String::new(), String::new(), String::new(), String::new());
 
         // Config from ini file
         if let Some(config_path) = matches.value_of("config") {
@@ -56,6 +58,10 @@ impl Command for RunCmd {
             if let Some(password) = section.get("password") {
                 obj.password = password.to_owned();
             }
+
+            if let Some(database) = section.get("database") {
+                obj.database = database.to_owned();
+            }
         }
 
         // Config from options
@@ -71,16 +77,28 @@ impl Command for RunCmd {
             obj.password = password.to_owned();
         }
 
+        if let Some(database) = matches.value_of("database") {
+            obj.database = database.to_owned();
+        }
+
         Ok(obj)
     }
 
     fn run(&self) -> Result<(), String> {
-        let db_connr = Connection::connect(&format!("postgresql://{}:{}@{}", self.user, self.password, self.host)[..], SslMode::None);
+        let db_connr = Connection::connect(&format!("postgresql://{}:{}@{}/{}", self.user, self.password, self.host, self.database)[..], SslMode::None);
         if let Err(err) = db_connr {
+            println!("Error connecting to database: {:?}", err);
             return Err(err.to_string())
         }
 
         let db_conn = db_connr.unwrap();
+        let res = db_conn.query("SELECT * FROM information_schema.schemata", &[]).unwrap();
+        println!("{:?}", res);
+
+        for r in &res {
+            println!("catalog_name => {:?}\
+                     ", c.get("catalog_name"), c.get("schema_name"), c.get(""));
+        }
 
         Ok(())
     }

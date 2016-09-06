@@ -11,7 +11,7 @@ The run command runs a series of database migrations on a specified database.
 ### `--target/-t` option
 Specifies the database schema version that Migrate will attempt to reach by running migrations.
 
-### `--migrations-dir/-d` option
+### `--migrations-dir/-m` option
 The directory to look for migrations in. Defaults to `migrations`.
 
 ### `--config/-c` option
@@ -35,6 +35,9 @@ Specifies which section in the provided `.ini` file to use.
 These command line options provide the information needed to connect to the database Migrate will run on.
 Values provided with these command line options will override any set in a specified `.ini` file.
 
+### `--database/-d`
+The database to run migration on. Will override `database` value in specified `.ini` file.
+
 ### `--backup/-b` option
 This option specifies when in the migration process backups should take place.
 
@@ -47,14 +50,14 @@ create <migration name>
 ```
 Where `migration name` is a short descriptor of the migration. Think of it as a commit message in git.
 
-### `--migrations-dir/-d` option
+### `--migrations-dir/-m` option
 The directory to put the new migration in. Defaults to `migrations`.
 
 # Migration structure
 A typical migration would look as such
 
 ```
-|- migrations        <-- `--migrations-dir/-d`
+|- migrations        <-- `--migrations-dir/-m`
 |--- add-posts-table <-- Short descriptive name of migration
 |----- version      <-- Migration configuration file
 |----- up.rs         <-- Rust file to run when performing the migration
@@ -86,3 +89,17 @@ fn run(conn: *postgres::Connection) {
 }
 ```
 
+# In the background
+Migrate creates a `schema_versions` table as follows:
+
+```sql
+CREATE TYPE schema_version_status AS ENUM ('ongoing', 'success', 'fail');
+CREATE TABLE schema_versions (
+    id INT PRIMARY KEY NOT NULL,           # Unique id
+    updated DATETIME NOT NULL,             # Most recent update in status (Updated when status changes)
+    version INT NOT NULL,                  # Schema version
+    migration_hash TEXT NOT NULL,          # Hash of migration directory
+    status schema_version_status NOT NULL, # Status of the migration, either 'ongoing', 'success', or 'fail'
+    lib_version INT NOT NULL               # Version Migrate used to perform migration, useful for internal migrations
+);
+```
