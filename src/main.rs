@@ -1,9 +1,14 @@
+#![warn(missing_docs)]
+
+#[macro_use]
+extern crate log;
 extern crate clap;
 extern crate ini;
 extern crate postgres;
 
 mod commands;
 mod models;
+mod db_schema_ver;
 
 use models::command::Command;
 
@@ -12,6 +17,7 @@ use clap::{Arg, App, SubCommand};
 
 fn main() {
     let prgm_ver = env!("CARGO_PKG_VERSION");
+    info!("Migrate v{}", prgm_ver);
 
     // Define command line options
     let app_matches = App::new("Migrate")

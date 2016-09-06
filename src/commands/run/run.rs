@@ -7,6 +7,7 @@ use ini::Ini;
 use postgres::{Connection, SslMode};
 
 use models;
+use db_schema_ver;
 
 #[derive(Debug)]
 pub struct RunCmd {
@@ -24,6 +25,10 @@ impl RunCmd {
             password: password,
             database: database
          }
+    }
+
+    fn make_db_conn_str(&self) -> String {
+        format!("postgresql://{}:{}@{}/{}", self.user, self.password, self.host, self.database)
     }
 }
 
@@ -85,20 +90,20 @@ impl models::command::Command <RunCmd> for RunCmd {
     }
 
     fn run(&self) -> Result<(), String> {
-        let db_connr = Connection::connect(&format!("postgresql://{}:{}@{}/{}", self.user, self.password, self.host, self.database)[..], SslMode::None);
+        let db_connr = Connection::connect(self.make_db_conn_str(), SslMode::None);
         if let Err(err) = db_connr {
             println!("Error connecting to database: {:?}", err);
             return Err(err.to_string())
         }
 
-        let db_conn = db_connr.unwrap();
-        let res = db_conn.query("SELECT * FROM information_schema.schemata", &[]).unwrap();
-        println!("{:?}", res);
+        let db_conn = match db_connr {
+            Ok(conn) => conn,
+            Err(err) => {
+                error!("Error connecting to database: {}", err);
+                panic!("Error connecting to database");
+            }
+        };
 
-        for r in &res {
-            println!("catalog_name => {:?}\
-                     ", c.get("catalog_name"), c.get("schema_name"), c.get(""));
-        }
 
         Ok(())
     }
