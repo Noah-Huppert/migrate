@@ -1,4 +1,6 @@
 #![warn(missing_docs)]
+//! Main fie for Migrate
+//! A simple database migrator written in Rust
 
 #[macro_use]
 extern crate log;
@@ -8,7 +10,6 @@ extern crate postgres;
 
 mod commands;
 mod models;
-mod db_schema_ver;
 
 use models::command::Command;
 

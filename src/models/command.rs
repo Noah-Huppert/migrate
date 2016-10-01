@@ -1,5 +1,3 @@
-extern crate clap;
-
 use clap::ArgMatches;
 
 pub trait Command <CmdT> {

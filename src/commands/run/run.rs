@@ -1,13 +1,8 @@
-extern crate clap;
-extern crate ini;
-extern crate postgres;
-
 use clap::ArgMatches;
 use ini::Ini;
 use postgres::{Connection, SslMode};
 
 use models;
-use db_schema_ver;
 
 #[derive(Debug)]
 pub struct RunCmd {
@@ -90,6 +85,7 @@ impl models::command::Command <RunCmd> for RunCmd {
     }
 
     fn run(&self) -> Result<(), String> {
+        /*
         let db_connr = Connection::connect(self.make_db_conn_str(), SslMode::None);
         if let Err(err) = db_connr {
             println!("Error connecting to database: {:?}", err);
@@ -103,7 +99,7 @@ impl models::command::Command <RunCmd> for RunCmd {
                 panic!("Error connecting to database");
             }
         };
-
+        */
 
         Ok(())
     }

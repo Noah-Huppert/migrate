@@ -1,8 +1,5 @@
 //! The `db_schema_ver` module provides an interface for determining and modifying the schema version.
-extern crate chrono;
-extern crate postgres;
-
-use chrono::datetime::DateTime;
+use chrono::datetime;
 use postgres::Connection;
 use postgres::rows::Row;
 
@@ -120,6 +117,15 @@ impl<'a> DbSchemaVer<'a> {
         let req_cols = vec!["id", "updated", "version", "migration_hash", "status", "lib_ver"];
         let mut prov_cols = Vec::new();
 
+        /*
+        row.columns().any(|row| {
+            debug!("{}", row);
+            false
+        });
+        */
+
+        Err("BREAK")
+        /*
         row.columns().iter().map(|col| {
             prov_cols.push(col.name());
         });
@@ -156,14 +162,15 @@ impl<'a> DbSchemaVer<'a> {
             }
         };
 
-        VerEntry {
+        Some(VerEntry {
             id: row.get("id"),
             updated: updatedv,// Parse date time from ISO 8601 string (RFC-3339 == ISO-8601 in this case)
             version: row.get("version"),
             migration_hash: row.get("migration_hash"),
             status: statusv,
             lib_ver: row.get("lib_ver")
-        }
+        })
+        */
     }
 
     /// Retrieves most recent schema version information
