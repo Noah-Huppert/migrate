@@ -9,9 +9,10 @@ extern crate ini;
 extern crate postgres;
 
 mod commands;
-mod models;
+mod structs;
+mod traits;
 
-use models::command::Command;
+use traits::command;
 
 //use std::io::{self, Write};
 use clap::{Arg, App, SubCommand};
@@ -38,12 +39,14 @@ fn main() {
                                     .default_value("migrations")
                                 )
                             )
-                            .subcommand(commands::run::sub_cmd::sub_cmd())
+                            .subcommand(commands::run::mk_cli_config())
                             .get_matches();
 
     // Run sub-command
-    let sub
+    // TODO: New run logic
+    //let sub
 
+    /*
     match app_matches.subcommand() {
         ("create", Some(sub_matches)) => {
             println!("TODO: create command -> {:?}", sub_matches);
@@ -75,4 +78,5 @@ fn main() {
         }
         _ => {}
     }
+    */
 }
