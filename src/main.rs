@@ -41,6 +41,9 @@ fn main() {
                             .subcommand(commands::run::sub_cmd::sub_cmd())
                             .get_matches();
 
+    // Run sub-command
+    let sub
+
     match app_matches.subcommand() {
         ("create", Some(sub_matches)) => {
             println!("TODO: create command -> {:?}", sub_matches);

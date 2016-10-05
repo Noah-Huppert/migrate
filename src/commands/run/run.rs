@@ -1,6 +1,6 @@
 use clap::ArgMatches;
 use ini::Ini;
-use postgres::{Connection, SslMode};
+//use postgres::{Connection, SslMode};
 
 use models;
 
